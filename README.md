@@ -1,2 +1,1 @@
-# DarkRaw
-Native Android 16-bit GPU darkroom &amp; batch RAW developer for Canon .CR2, .DNG, .NEF &amp; .ARW. Powered by LibRaw NDK + OpenGL ES 3.0 (GL_RGBA16F). 100% offline.
+DarkroomRAW is an offline-first, zero-account native Android RAW developing engine and bulk processor optimized for arm64-v8a (Snapdragon 8 Gen 1 / Adreno 730). It combines a C++20 LibRaw JNI bridge for 14-bit linear sensor demosaicing with a real-time 60fps OpenGL ES 3.0 16-bit half-float (GL_RGBA16F) shader pipeline, tactile safelight OLED UI (#000000), monotone cubic spline tone curves, analog film presets, and thermal-safe background batch printing to JPEG (90–100%) and 16-bit uncompressed TIFF via Jetpack WorkManager and AndroidX ExifInterface.
