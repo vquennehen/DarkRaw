@@ -38,35 +38,40 @@ jobs:
           path = Path("DarkroomRAW/app/src/main/cpp/third_party/LibRaw/src/decoders/crx.cpp")
           text = path.read_text()
 
-          old = '''#ifdef LIBRAW_USE_OPENMP
-  int results[4] ={0,0,0,0}; // nPlanes is always <= 4
-#pragma omp parallel for
-  for (int32_t plane = 0; plane < nPlanes && plane < 4; ++plane)
-   try {
-    results[plane] = crxDecodePlane(img, plane);
-   } catch (...) {
-    results[plane] = 1;
-   }
+          old = "\n".join([
+              "#ifdef LIBRAW_USE_OPENMP",
+              "  int results[4] ={0,0,0,0}; // nPlanes is always <= 4",
+              "#pragma omp parallel for",
+              "  for (int32_t plane = 0; plane < nPlanes && plane < 4; ++plane)",
+              "   try {",
+              "    results[plane] = crxDecodePlane(img, plane);",
+              "   } catch (...) {",
+              "    results[plane] = 1;",
+              "   }",
+              "",
+              "  for (int32_t plane = 0; plane < nPlanes; ++plane)",
+              "    if (results[plane])",
+              "      derror();",
+              "#else",
+          ])
 
-  for (int32_t plane = 0; plane < nPlanes; ++plane)
-    if (results[plane])
-      derror();
-#else'''
-          new = '''#ifdef LIBRAW_USE_OPENMP
-  int results[4] ={0,0,0,0}; // nPlanes is always <= 4
-  const int32_t planeLimit = nPlanes < 4 ? nPlanes : 4;
-#pragma omp parallel for
-  for (int32_t plane = 0; plane < planeLimit; ++plane)
-   try {
-    results[plane] = crxDecodePlane(img, plane);
-   } catch (...) {
-    results[plane] = 1;
-   }
-
-  for (int32_t plane = 0; plane < nPlanes; ++plane)
-    if (results[plane])
-      derror();
-#else'''
+          new = "\n".join([
+              "#ifdef LIBRAW_USE_OPENMP",
+              "  int results[4] ={0,0,0,0}; // nPlanes is always <= 4",
+              "  const int32_t planeLimit = nPlanes < 4 ? nPlanes : 4;",
+              "#pragma omp parallel for",
+              "  for (int32_t plane = 0; plane < planeLimit; ++plane)",
+              "   try {",
+              "    results[plane] = crxDecodePlane(img, plane);",
+              "   } catch (...) {",
+              "    results[plane] = 1;",
+              "   }",
+              "",
+              "  for (int32_t plane = 0; plane < nPlanes; ++plane)",
+              "    if (results[plane])",
+              "      derror();",
+              "#else",
+          ])
 
           if old not in text:
               raise SystemExit("Expected LibRaw OpenMP loop not found in crx.cpp")
